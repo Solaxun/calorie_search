@@ -19,35 +19,40 @@ def get_cals(recipe):
     f = recipe.fat * cals.get('fat')
     return p + c + f
 
-recipes = [make_recipe() for i in range(1,301)]
 
 def tuple_sub(x,y):
      return RECIPE(*[x-y for x,y in zip(x,y)])
 
-def is_goal(meals,target):
+def is_goal(meals,target=TARGET_2):
     for meal in meals:
         target = tuple_sub(target,meal)
-    print(target)
+    # print(target)
     if -3<=target.protein<=3 and -3<=target.carbohydrates<=3 and -3<=target.fat<=3:
         return True
     else:
         return False
 #successors function gen successors based on meal type? e.g. only expand
 #breakfast tagged meals in successor function for  breakfast?
-def make_plan(meals=[],goal=TARGET_2,num_meals=3):
-    """start with random selection from meal options with num_meals
-    set.  Then iteratively change one recipe at a time and check 
-    constraints, backing up if necessary"""
-    if is_goal(meals,TARGET_2):
-        return meals
-    if len(meals)>=num_meals:
-        meals.pop()
-    recipe = random.choice(recipes)
-    recipes.remove(recipe)
-    meals.append(recipe)
-    return make_plan(meals)
 
-print(make_plan(num_meals=6))
+def successors(state):
+    recipes = [make_recipe() for i in range(1,301)]
+    return recipes
 
+def depth_limited_search(state,limit=3):
+    if is_goal(state):
+        return state
+    elif limit == 0:
+        return 'cutoff'
+    else:
+        cutoff_occurred = False
+        for child in successors(state):
+            newstate = state+[child]
+            result = depth_limited_search(newstate,limit-1)
+            if result == 'cutoff':
+                cutoff_occurred = True
+            elif result is not None:
+                return result
+        return 'cutoff' if cutoff_occurred else None
 
+print(depth_limited_search([]))
 
