@@ -34,7 +34,8 @@ def is_goal(meals,target=TARGET_2):
 #successors function gen successors based on meal type? e.g. only expand
 #breakfast tagged meals in successor function for  breakfast?
 
-def successors(state):
+def successors():
+    """ make meal specific so if breakfast in frontier only expand lunch"""
     recipes = [make_recipe() for i in range(1,301)]
     return recipes
 
@@ -45,7 +46,7 @@ def depth_limited_search(state,limit=3):
         return 'cutoff'
     else:
         cutoff_occurred = False
-        for child in successors(state):
+        for child in successors():
             newstate = state+[child]
             result = depth_limited_search(newstate,limit-1)
             if result == 'cutoff':
@@ -54,5 +55,11 @@ def depth_limited_search(state,limit=3):
                 return result
         return 'cutoff' if cutoff_occurred else None
 
-print(depth_limited_search([]))
+meal_plan = depth_limited_search([],limit=3)
+for meal in meal_plan:
+    print(meal,get_cals(meal))
 
+
+
+
+ 
